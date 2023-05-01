@@ -19,17 +19,21 @@ export default class AllPlugs {
 
     public async initialiseDevices():Promise<void> {
         for(let device in this.devicesConfig){
-            this.devices.push(
-                {
-                    api: new P110(this.devicesConfig[device].ip,
-                        this.devicesConfig[device].email || this.secrets.email,
-                        this.devicesConfig[device].pass || this.secrets.pass,
-                        this.devicesConfig[device].timeout || Number(this.secrets.timeout)),
-                    name: this.devicesConfig[device].name,
-                    initialised_ok: false,
-                    type: this.devicesConfig[device].type || CustomDeviceType.PLUG,
-                }
-            )
+            if(this.devicesConfig[device].type && this.devicesConfig[device].type === CustomDeviceType.PLUG){
+                this.devices.push(
+                    {
+                        api: new P110(this.devicesConfig[device].ip,
+                            this.devicesConfig[device].email || this.secrets.email,
+                            this.devicesConfig[device].pass || this.secrets.pass,
+                            this.devicesConfig[device].timeout || Number(this.secrets.timeout)),
+                        name: this.devicesConfig[device].name,
+                        initialised_ok: false,
+                        type: this.devicesConfig[device].type || CustomDeviceType.PLUG,
+                        last_update: 0,
+                        update_interval: this.devicesConfig[device].update_interval || Number(this.secrets.timeout)
+                    }
+                );
+            }
         }
 
         const promises:Promise<any>[] = [];
@@ -37,33 +41,32 @@ export default class AllPlugs {
             promises.push(this.initialiseDevice(this.devices[device]));
         }
 
-        const values = await Promise.allSettled(promises);
-        for(let prom of values){
-            if(prom.status === 'fulfilled'){
-                //console.log("device", prom.value, "succeeded");
-            }else{
-                //console.log("device", prom.reason, "failed");
-            }
-        }
+        await Promise.allSettled(promises);
+        // for(let prom of values){
+        //     if(prom.status === 'fulfilled'){
+        //         //console.log("device", prom.value, "succeeded");
+        //     }else{
+        //         //console.log("device", prom.reason, "failed");
+        //     }
+        // }
     }
 
     private initialiseDevice(device: CustomDevice):Promise<any> {
         return new Promise(async (resolve, reject) => {
+            const now = new Date();
             try{
                 await device.api.handshake();
-                console.log("handshake ok", device.name);
                 await device.api.login();
-                console.log("login ok", device.name);
-                const info = await device.api.getDeviceInfo();
-                console.log("info is ok", device.name);
-                const consumption = await device.api.getEnergyUsage();
-                console.log("consumption is ok", device.name);
+                await device.api.getDeviceInfo();
+                await device.api.getEnergyUsage();
                 device.initialised_ok = true;
                 device.last_error = undefined;
+                device.last_update = now.getTime();
                 resolve(device.name);
             }catch(e:any){
                 device.initialised_ok = false;
                 device.last_error = e.message;
+                device.last_update = now.getTime();
                 reject(device.name);
             }
         });
@@ -71,18 +74,20 @@ export default class AllPlugs {
 
     private updateDevice(device: CustomDevice):Promise<any>{
         return new Promise(async (resolve, reject) => {
-            if(device.initialised_ok){
+            const now = new Date();
+            if(device.initialised_ok && ((now.getTime() - device.last_update) > device.update_interval)){
                 try{
                     await device.api.getDeviceInfo();
                     await device.api.getEnergyUsage();
                     device.last_error = undefined;
+                    device.last_update = now.getTime();
                     resolve(device.name);
                 }catch(e:any){
                     device.last_error = e;
+                    device.last_update = now.getTime();
                     reject(device.name);
                 }
             }else{
-                console.log("device failed to update", device.name);
                 reject(device.name);
             }
         });

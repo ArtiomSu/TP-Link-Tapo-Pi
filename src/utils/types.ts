@@ -47,6 +47,8 @@ export interface CustomDevice{
     type: CustomDeviceType;
     last_error?: string;
     initialised_ok: boolean;
+    last_update: number;
+    update_interval: number;
 }
 
 
