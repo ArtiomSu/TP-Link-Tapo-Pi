@@ -8,7 +8,7 @@ const jsonfileData = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
 
 function deviceToString(device: CustomDevice): any{
     const info = device.api.getSysInfo();
-    const power = device.api.getPowerConsumption();
+    const power:any = device.api.getPowerConsumption();
 
     return {
         device: `${device.name}@${device.api.ipAddress}`,
