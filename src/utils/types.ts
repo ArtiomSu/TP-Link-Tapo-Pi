@@ -44,6 +44,8 @@ export type ConsumptionInfoBulb = {
   month_energy: number;
 }
 
+export type CustomPermissions = 'power' | 'color'
+
 export enum CustomDeviceType {
   PLUG = 'plug',
   BULB = 'bulb',
@@ -58,6 +60,7 @@ export interface CustomDevice{
   initialised_ok: boolean;
   last_update: number;
   update_interval: number;
+  permissions: CustomPermissions[];
 }
 
 

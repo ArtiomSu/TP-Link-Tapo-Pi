@@ -1,7 +1,9 @@
-import AllDevices from "../utils/getAllDevices";
+import AllDevices from "../utils/allDevices";
 import { ConsumptionInfo, ConsumptionInfoBulb, CustomDevice, CustomDeviceType } from "../utils/types";
 const readline = require('readline');
 require('dotenv').config();
+const Table = require('cli-table');
+const colors = require('colors/safe');
 
 const fs = require('fs')
 const jsonfileData = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
@@ -22,23 +24,38 @@ function deviceToString(device: CustomDevice): any{
         showInfo = `${brightness} ${info ? info.color_temp : 0}`;
     }
 
-    let devType = '';
-    if(device.type === CustomDeviceType.BULB){
-        devType = '';
-    }else if(device.type === CustomDeviceType.LIGHT_STRIP){
-        devType = '';
-    }
+    const on:boolean = info ? info.device_on : false;
 
-    return {
-        '': devType,
-        '': `${device.name}@..${device.api.ipAddress.substring(11)}`,
-        //on: `${info ? info.device_on ? 'Y' : 'N' : 'N'}`,
-        '': `${info ? info.device_on ? '' : '' : ''}`,
-        '': `${power ? power.today_runtime.toFixed(3) : 0}h ${power ? power.today_energy.toFixed(3) : 0}kWh`,
-        '': `${power ? power.month_runtime.toFixed(3) : 0}h ${power ? power.month_energy.toFixed(3) : 0}kWh`,
-        '': showInfo, 
-        '': `${device.last_error ? device.last_error : ''}`
+
+
+    let devType = on ? colors.red('') : colors.gray('');
+    if(device.type === CustomDeviceType.BULB){
+        devType = on ? colors.yellow('') : colors.gray('');
+    }else if(device.type === CustomDeviceType.LIGHT_STRIP){
+        devType = on ? colors.magenta('') : colors.gray('');
     }
+    return [
+        devType,
+        //`${device.name}@..${device.api.ipAddress.substring(11)}`,
+        `${device.name}`,
+        `${device.api.ipAddress.substring(12)}`,
+        //`${info ? info.device_on ? colors.green('') : colors.red('') : colors.red('')}`,
+        `${power ? power.today_runtime.toFixed(3) : 0}h ${power ? power.today_energy.toFixed(3) : 0}kWh`,
+        `${power ? power.month_runtime.toFixed(3) : 0}h ${power ? power.month_energy.toFixed(3) : 0}kWh`,
+        showInfo, 
+        `${device.last_error ? device.last_error : ''}`
+    ]
+
+    //return {
+    //    '': devType,
+    //    '': `${device.name}@..${device.api.ipAddress.substring(11)}`,
+    //    //on: `${info ? info.device_on ? 'Y' : 'N' : 'N'}`,
+    //    '': `${info ? info.device_on ? '' : '' : ''}`,
+    //    '': `${power ? power.today_runtime.toFixed(3) : 0}h ${power ? power.today_energy.toFixed(3) : 0}kWh`,
+    //    '': `${power ? power.month_runtime.toFixed(3) : 0}h ${power ? power.month_energy.toFixed(3) : 0}kWh`,
+    //    '': showInfo, 
+    //    '': `${device.last_error ? device.last_error : ''}`
+    //}
 }
 
 function clearScreen(){
@@ -51,13 +68,36 @@ function clearScreen(){
 async function display(obj: AllDevices) {
     await obj.updateDevices();
     const d = obj.getDevices();
-    const table:any = [];
+    // const table:any = [];
+    // for(let i in d){
+    //     table.push(deviceToString(d[i]));
+    // }
+    const table = new Table({
+        head: [
+            '',
+            '',
+            '',
+            //'',
+            '',
+            '',
+            '',
+            '',
+        ],
+        style: { 
+            'padding-left': 1, 
+            'padding-right': 2,
+            'border': ['grey'],
+            'head': ['gray'],
+        },
+        colAligns: ['middle', 'middle', 'middle', 'middle', 'middle', 'middle', 'middle']
+    });
     for(let i in d){
         table.push(deviceToString(d[i]));
     }
+
     clearScreen();
     console.log("\n");
-    console.table(table);
+    console.table(table.toString());
     setTimeout(()=>{
         display(obj);
     }, 1500);
