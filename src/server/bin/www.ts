@@ -25,7 +25,7 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(port, process.env.BIND_ADDRESS || '127.0.0.1');
 server.on('error', onError);
 server.on('listening', onListening);
 
@@ -87,4 +87,6 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  console.log("listening on", bind);
+  console.log("using " + process.env.INTERFACE_IP + " to send commands to devices");
 }

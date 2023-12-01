@@ -10,8 +10,9 @@ export default class L510E extends P100 {
         public readonly email: string,
         public readonly password: string,
         public readonly timeout: number,
+        public readonly interfaceIp: string,
   ) {
-    super(ipAddress, email, password, timeout);
+    super(ipAddress, email, password, timeout, interfaceIp);
     //console.log('Constructing L510E on host: ' + ipAddress);
   }
 

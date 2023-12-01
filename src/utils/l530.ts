@@ -11,8 +11,9 @@ export default class L530 extends L510E {
         public readonly email: string,
         public readonly password: string,
         public readonly timeout: number,
+        public readonly interfaceIp: string,
   ) {
-    super(ipAddress, email, password, timeout);
+    super(ipAddress, email, password, timeout, interfaceIp);
     //console.log('Constructing L530 on host: ' + ipAddress);
     this._consumption = {
       today_runtime: 0,
@@ -44,10 +45,16 @@ export default class L530 extends L510E {
                   '},'+
                   '"requestTimeMils": ' + Math.round(Date.now() * 1000) + ''+
                   '};';
-
+    
+    if(this.is_klap){
+      return this.newHandleRequest(payload).then(()=>{
+        return true;
+      });
+    }
     return this.handleRequest(payload).then(()=>{
       return true;
     });
+
   }
 
   async setColor(hue:number, saturation:number):Promise<boolean>{
@@ -100,7 +107,12 @@ export default class L530 extends L510E {
                     '"requestTimeMils": ' + Math.round(Date.now() * 1000) + ''+
                     '};';
     try{                
-      const response = await this.handleRequest(payload);
+      let response;
+      if(this.is_klap){
+        response = await this.newHandleRequest(payload);
+      }else{
+        response = await this.handleRequest(payload);
+      }
 
       if(response && response.result && response.result.time_usage){
         this._consumption = {
@@ -122,7 +134,11 @@ export default class L530 extends L510E {
     } catch(error: any){
       if(error.message.indexOf('9999') > 0){
         try{
-          await this.reconnect();
+          if(this.is_klap){
+            await this.newReconnect();
+          }else{
+            await this.reconnect();
+          }
         }catch(e){}
       }
       //return false;

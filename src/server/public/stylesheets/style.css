@@ -159,3 +159,15 @@ a {
 .device-error{
   margin-top: 1em;
 }
+
+@media screen and (max-width: 1300px){
+  #all-devices{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 850px){
+  #all-devices{
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

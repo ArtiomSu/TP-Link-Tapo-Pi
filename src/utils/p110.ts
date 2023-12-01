@@ -10,8 +10,9 @@ export default class P110 extends P100 {
         public readonly email: string,
         public readonly password: string,
         public readonly timeout: number,
+        public readonly interfaceIp: string,
   ) {
-    super(ipAddress, email, password, timeout);
+    super(ipAddress, email, password, timeout,interfaceIp);
     //console.log('Constructing P110 on host: ' + ipAddress);
   }
 
@@ -22,7 +23,12 @@ export default class P110 extends P100 {
         '};';
 
     try{
-      const response = await this.handleRequest(payload);
+      let response;
+      if(this.is_klap){
+        response = await this.newHandleRequest(payload);
+      }else{
+        response = await this.handleRequest(payload);
+      }
 
       if(response && response.result){
         this._consumption = {

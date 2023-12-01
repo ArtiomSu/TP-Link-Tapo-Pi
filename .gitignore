@@ -125,3 +125,4 @@ dist
 old
 config.json
 package-lock.json
+ips.json

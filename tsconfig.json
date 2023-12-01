@@ -8,6 +8,8 @@
       "es2017",
       "es2018",
       "es2020",
+      "dom",
+      "dom.iterable"
     ],
     "declaration": true,
     "declarationMap": true,

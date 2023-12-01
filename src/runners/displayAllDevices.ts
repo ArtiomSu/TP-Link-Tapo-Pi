@@ -7,6 +7,33 @@ const colors = require('colors/safe');
 
 const fs = require('fs')
 const jsonfileData = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
+let macDict:any = {};
+try{
+    const ips = JSON.parse(fs.readFileSync('./ips.json', 'utf-8'));
+    ips.map(ip =>{
+        let r = {
+            ip: undefined,
+            mac: undefined,
+        }
+        for(let addr of ip.address){
+            if(addr['+@addrtype'] === 'mac'){
+                r.mac = addr['+@addr'];
+            }else if(addr['+@addrtype'] === 'ipv4'){
+                r.ip = addr['+@addr'];
+            }
+        }
+        if(r.mac){
+            macDict[r.mac] = r.ip;
+        }
+        return r;
+    });
+}catch(e:any){
+    if(e.code === 'ENOENT'){
+        console.log("ips.json file not found. You can run ./getIps.sh to generate it. Its only needed if you want to use mac address mapping");
+    }else{
+        console.error("failed to read ips", e);
+    }
+}
 
 function deviceToString(device: CustomDevice): any{
     const info:any = device.api.getSysInfo();
@@ -34,11 +61,12 @@ function deviceToString(device: CustomDevice): any{
     }else if(device.type === CustomDeviceType.LIGHT_STRIP){
         devType = on ? colors.magenta('') : colors.gray('');
     }
+    const ipAdd = device.api.ipAddress.split('.');
     return [
         devType,
         //`${device.name}@..${device.api.ipAddress.substring(11)}`,
         `${device.name}`,
-        `${device.api.ipAddress.substring(12)}`,
+        `${ipAdd[ipAdd.length -1]}`,
         //`${info ? info.device_on ? colors.green('') : colors.red('') : colors.red('')}`,
         `${power ? power.today_runtime.toFixed(3) : 0}h ${power ? power.today_energy.toFixed(3) : 0}kWh`,
         `${power ? power.month_runtime.toFixed(3) : 0}h ${power ? power.month_energy.toFixed(3) : 0}kWh`,
@@ -104,10 +132,11 @@ async function display(obj: AllDevices) {
 }
 
 (async() => {
-    const allDevices = new AllDevices(jsonfileData, {
+    const allDevices = new AllDevices(jsonfileData, macDict, {
         pass: process.env.API_PASS,
         email: process.env.API_EMAIL,
         timeout: process.env.TIMEOUT,
+        interfaceIp: process.env.INTERFACE_IP
     });
     await allDevices.initialiseDevices();
     display(allDevices);

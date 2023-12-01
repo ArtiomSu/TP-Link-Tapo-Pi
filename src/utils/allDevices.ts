@@ -6,15 +6,18 @@ import { CustomDevice, CustomDeviceType } from "./types";
 export default class AllDevices {
 
     private devicesConfig;
+    private macDict;
     private secrets = {
         pass: '',
         email: '',
         timeout: 1000,
-    }
+        interfaceIp: '127.0.0.1' 
+    };
 
-    constructor(config: any[], secrets: any){
+    constructor(config: any[], macDict: any, secrets: any){
         this.devicesConfig = config;
         this.secrets = secrets;
+        this.macDict = macDict;
     }
 
     private devices: CustomDevice[] = [];
@@ -23,7 +26,7 @@ export default class AllDevices {
 
     public async initialiseDevices():Promise<void> {
         for(let device in this.devicesConfig){
-            if(this.devicesConfig[device].type){
+            if(this.devicesConfig[device].type && !this.devicesConfig[device].hidden){
                 let whichClass:any = P110;
                 if(this.devicesConfig[device].type === CustomDeviceType.BULB){
                     whichClass = L530;
@@ -31,12 +34,20 @@ export default class AllDevices {
                     whichClass = L900;
                 }
 
+                if(this.devicesConfig[device].mac){
+                    if(this.macDict[this.devicesConfig[device].mac]){
+                        this.devicesConfig[device].ip = this.macDict[this.devicesConfig[device].mac];
+                    }
+                }
+
                 this.devices.push(
                     {
                         api: new whichClass(this.devicesConfig[device].ip,
                             this.devicesConfig[device].email || this.secrets.email,
                             this.devicesConfig[device].pass || this.secrets.pass,
-                            this.devicesConfig[device].timeout || Number(this.secrets.timeout)),
+                            this.devicesConfig[device].timeout || Number(this.secrets.timeout),
+                            this.secrets.interfaceIp
+                        ),
                         name: this.devicesConfig[device].name,
                         initialised_ok: false,
                         type: this.devicesConfig[device].type,
@@ -67,8 +78,12 @@ export default class AllDevices {
         return new Promise(async (resolve, reject) => {
             const now = new Date();
             try{
-                await device.api.handshake();
-                await device.api.login();
+                const result = await device.api.handshake();
+                if(!result && device.api.is_klap){
+                    await device.api.handshake_new();
+                }else if(result){
+                    await device.api.login();
+                }
                 await device.api.getDeviceInfo();
                 await device.api.getEnergyUsage();
                 device.initialised_ok = true;
@@ -77,8 +92,9 @@ export default class AllDevices {
                 this.devicesIdDict[device.api.getSysInfo().device_id] = index;
                 resolve(device.name);
             }catch(e:any){
+                console.error(e);
                 device.initialised_ok = false;
-                device.last_error = e.message;
+                device.last_error = e && e.message ? e.message : 'no error message';
                 device.last_update = now.getTime();
                 reject(device.name);
             }

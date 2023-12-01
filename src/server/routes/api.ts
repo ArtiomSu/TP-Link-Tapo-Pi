@@ -8,10 +8,39 @@ let allDevices:AllDevices;
 
 const intialise = async () => {
   const jsonfileData = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
-  allDevices = new AllDevices(jsonfileData, {
+  let macDict:any = {};
+  try{
+    const ips = JSON.parse(fs.readFileSync('./ips.json', 'utf-8'));
+    ips.map(ip =>{
+      let r = {
+        ip: undefined,
+        mac: undefined,
+      }
+      for(let addr of ip.address){
+        if(addr['+@addrtype'] === 'mac'){
+          r.mac = addr['+@addr'];
+        }else if(addr['+@addrtype'] === 'ipv4'){
+          r.ip = addr['+@addr'];
+        }
+      }
+      if(r.mac){
+        macDict[r.mac] = r.ip;
+      }
+      return r;
+    });
+  }catch(e:any){
+    if(e.code === 'ENOENT'){
+      console.log("ips.json file not found. You can run ./getIps.sh to generate it. Its only needed if you want to use mac address mapping");
+    }else{
+      console.error("failed to read ips", e);
+    }
+  }
+  //console.log(macDict);
+  allDevices = new AllDevices(jsonfileData, macDict, {
         pass: process.env.API_PASS,
         email: process.env.API_EMAIL,
         timeout: process.env.TIMEOUT,
+        interfaceIp: process.env.INTERFACE_IP
   });
   await allDevices.initialiseDevices();
 }
