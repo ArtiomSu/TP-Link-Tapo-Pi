@@ -2,9 +2,11 @@
 
 Designed to control and monitor tapo devices from a raspberry pi 2b connect via ethernet to the main network and wifi to the guest network where the tapo smart devices are. So the api and web app is only accessible via the main network, but sends the requests to control the tapo devices over the guest network.
 
+This project wouldn't have been possible without the hard work gone into this project https://github.com/apatsufas/homebridge-tapo-p100. I don't use homebridge so decided to make a standalone version with its own frontend etc.
+
 # Dependancies
 ```bash
-sudo apt install nodejs nmap jq
+sudo apt install nodejs nmap jq arping
 
 VERSION=v4.40.3
 BINARY=yq_linux_arm
@@ -118,6 +120,18 @@ Run `npm run monitor` which will run a cli app in the terminal allowing you to m
 
 Run `npm run server` to start the api. To start the http client monitor run `node monitorClient.js` This will display the same output as the CLI only version but it will querry the api server instead, so that you can have the best of both worlds.
 
+# Systemd Service
 
+You can use the included systemd service if your setup is the same as mine. The service will grap the ips and create routes before starting the api.
+
+To create the service do the following
+
+```sh
+sudo cp tapoSystemd.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable tapoSystemd.service
+sudo systemctl start tapoSystemd.service
+
+```
 
 

@@ -263,8 +263,11 @@ class Client{
                     case this.CustomDeviceType.LIGHT_STRIP:
                         icon = 'fluorescent';
                         break;
-                } 
+                }
 
+                if(device.last_error && device.last_error.message){
+                    device.last_error = device.last_error.message;
+                }
 
                 htmlOut+=`
                 <div class="device ${!device.initialised_ok ? 'init-failed' : (on ? 'on' : 'off')}"> 
@@ -383,7 +386,7 @@ class Client{
         console.log("iro should be", this.iro);
         const isok:any = await this.api('GET', this.URL+'status');
         console.log("is initialised", isok);
-        if(!isok.success){
+        if(!isok || isok.length === 0){
             const didLoad = await this.api('GET', this.URL+'initialise');
             console.log("didLoad", didLoad);
         }

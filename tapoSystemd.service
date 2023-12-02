@@ -1,0 +1,11 @@
+[Unit]
+Description=Tapo Api Server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/bash /home/guest/smarthome/serviceHelper.sh
+Type=simple
+Restart=on-failure
+
+[Install]
+WantedBy=network.target

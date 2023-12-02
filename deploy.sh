@@ -11,8 +11,10 @@ ssh $HOST rm -rf ${LOC}/src
 scp -r ./src ${DEST}/src
 scp ./.env ${DEST}/
 scp ./config.json ${DEST}/
-scp ./ips.json ${DEST}/
 scp ./getIps.sh ${DEST}/
+scp ./genRoutes.js ${DEST}/
+scp ./serviceHelper.sh ${DEST}/
+scp ./tapoSystemd.service ${DEST}/
 scp ./package.json ${DEST}/
 scp ./tsconfig.json ${DEST}/
 

@@ -32,6 +32,9 @@ function deviceToString(device){
         devType = on ? colors.magenta('') : colors.gray('');
     }
     const ipAdd = device.ipAddress.split('.');
+    if(device.last_error && device.last_error.message){
+        device.last_error = device.last_error.message;
+    }
     return [
         devType,
         `${device.name}`,
@@ -44,8 +47,8 @@ function deviceToString(device){
 }
 
 function clearScreen(){
-    const blank = '\n'.repeat(process.stdout.rows);
-    console.log(blank);
+    //const blank = '\n'.repeat(process.stdout.rows);
+    //console.log(blank);
     readline.cursorTo(process.stdout, 0, 0);
     readline.clearScreenDown(process.stdout);
 }

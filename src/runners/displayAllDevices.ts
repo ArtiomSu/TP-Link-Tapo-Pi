@@ -6,8 +6,10 @@ const Table = require('cli-table');
 const colors = require('colors/safe');
 
 const fs = require('fs')
+const USE_NMAPIPS = false;
 const jsonfileData = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
 let macDict:any = {};
+if(USE_NMAPIPS){
 try{
     const ips = JSON.parse(fs.readFileSync('./ips.json', 'utf-8'));
     ips.map(ip =>{
@@ -15,11 +17,13 @@ try{
             ip: undefined,
             mac: undefined,
         }
-        for(let addr of ip.address){
-            if(addr['+@addrtype'] === 'mac'){
-                r.mac = addr['+@addr'];
-            }else if(addr['+@addrtype'] === 'ipv4'){
-                r.ip = addr['+@addr'];
+        if(Array.isArray(ip.address)){
+            for(let addr of ip.address){
+                if(addr['+@addrtype'] === 'mac'){
+                    r.mac = addr['+@addr'];
+                }else if(addr['+@addrtype'] === 'ipv4'){
+                    r.ip = addr['+@addr'];
+                }
             }
         }
         if(r.mac){
@@ -33,6 +37,23 @@ try{
     }else{
         console.error("failed to read ips", e);
     }
+}
+}else{
+  try{
+    let ips = fs.readFileSync('./ips.txt', 'utf-8');
+    ips = ips.split('\n');
+    for(let line of ips){
+      const split = line.split('__');
+      macDict[split[0].toUpperCase()] = split[1];
+    }
+  }catch(e:any){
+    if(e.code === 'ENOENT'){
+      console.log("ips.txt file not found. You can run ./getIps.sh to generate it. Its only needed if you want to use mac address mapping");
+    }else{
+      console.error("failed to read ips", e);
+    }
+  }
+
 }
 
 function deviceToString(device: CustomDevice): any{
