@@ -127,3 +127,6 @@ config.json
 package-lock.json
 ips.json
 ips.txt
+
+venv
+*.png

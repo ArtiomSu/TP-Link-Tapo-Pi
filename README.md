@@ -2,6 +2,8 @@
 
 Designed to control and monitor tapo devices from a raspberry pi 2b connect via ethernet to the main network and wifi to the guest network where the tapo smart devices are. So the api and web app is only accessible via the main network, but sends the requests to control the tapo devices over the guest network.
 
+Also has some fun things like a cli, web UI. A python script that updates the bulbs to the average colour of your screen etc.
+
 This project wouldn't have been possible without the hard work gone into this project https://github.com/apatsufas/homebridge-tapo-p100. I don't use homebridge so decided to make a standalone version with its own frontend etc.
 
 # Dependancies
@@ -134,4 +136,16 @@ sudo systemctl start tapoSystemd.service
 
 ```
 
+# Screen to Bulbs
 
+This will send the average colour of the centre of your screen to your bulbs
+
+## Install and run
+```
+python -m venv venv
+./venv/bin/pip3 install pyautogui
+./venv/bin/pip3 install requests
+./venv/bin/python3 ./screenToBulbs.py
+```
+
+Make sure to edit the values in that script to your own ones. specifically the device ids
