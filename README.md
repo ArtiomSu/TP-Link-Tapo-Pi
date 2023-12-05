@@ -6,6 +6,10 @@ Also has some fun things like a cli, web UI. A python script that updates the bu
 
 This project wouldn't have been possible without the hard work gone into this project https://github.com/apatsufas/homebridge-tapo-p100. I don't use homebridge so decided to make a standalone version with its own frontend etc.
 
+# Video Demo and Guide
+
+[![video guide and demo](https://img.youtube.com/vi/wu_cVN6Noyg/0.jpg)](https://www.youtube.com/watch?v=wu_cVN6Noyg)
+
 # Dependancies
 ```bash
 sudo apt install nodejs nmap jq arping
