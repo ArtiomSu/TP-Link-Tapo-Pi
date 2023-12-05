@@ -241,7 +241,7 @@ class Client{
 
     renderAllDevices(){
         const container = document.getElementById('all-devices');
-        if(container && this.AllDevices){
+        if(container && this.AllDevices && Array.isArray(this.AllDevices) && this.AllDevices.length > 0){
             let htmlOut = '';
             for(let device of this.AllDevices){
                 const on = device.info ? device.info.device_on : false;
@@ -345,6 +345,11 @@ class Client{
         this.renderAllDevices();
     }
 
+    async restart(){
+        const didLoad = await this.api('GET', this.URL+'restart-systemd');
+        console.log("restart", didLoad);
+    }
+
     async updateAll(){
         const didLoad = await this.api('GET', this.URL+'update');
         console.log("didLoad", didLoad);
@@ -399,7 +404,21 @@ class Client{
 
 }
 
+let showOptions = false;
 
+//@ts-ignore
+window.toggleOptions = function(){
+    showOptions = !showOptions;
+    let display = "none";
+    if(showOptions){
+        display = "flex";
+    }
+    let elements = document.querySelectorAll('.dangerous');
+    for(var i=0; i<elements.length; i++){
+        //@ts-ignore
+        elements[i].style.display = display;
+    }
+}
 
 
 window.onload = function(){

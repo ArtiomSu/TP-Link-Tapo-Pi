@@ -24,9 +24,13 @@ deviceIds=[
     #'8023FDFEFF1A4374000CF2B385024A082038A2FD', # led strip
 ]
 
+defaultColorh=30
+defaultColors=100
+
 #pyautogui.moveTo(width, height)
 #time.sleep(5)
 #print(pyautogui.position())
+#time.sleep(50)
 
 def calulate_data():
     im = pyautogui.screenshot(region=(math.floor(width-(boxSize/2)),math.floor(height-(boxSize/2)), boxSize, boxSize))
@@ -54,6 +58,12 @@ def calulate_data():
 
     hue = int(avg_color_hsv[0] * 360)  # Convert hue back to 0-360 range
     saturation = int(avg_color_hsv[1] * 100)  # Convert saturation to percentage
+
+    if hue == 0:
+        hue = defaultColorh
+
+    if saturation == 0:
+        saturation = defaultColors
 
     return (hue, saturation)
 

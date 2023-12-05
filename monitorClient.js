@@ -39,8 +39,8 @@ function deviceToString(device){
         devType,
         `${device.name}`,
         `${ipAdd[ipAdd.length -1]}`,
-        `${power ? power.today_runtime.toFixed(3) : 0}h ${power ? power.today_energy.toFixed(3) : 0}kWh`,
-        `${power ? power.month_runtime.toFixed(3) : 0}h ${power ? power.month_energy.toFixed(3) : 0}kWh`,
+        `${(power && power.today_runtime) ? power.today_runtime.toFixed(3) : 0}h ${(power && power.today_energy) ? power.today_energy.toFixed(3) : 0}kWh`,
+        `${(power && power.month_runtime) ? power.month_runtime.toFixed(3) : 0}h ${(power && power.month_energy) ? power.month_energy.toFixed(3) : 0}kWh`,
         showInfo, 
         `${device.last_error ? device.last_error : ''}`
     ]

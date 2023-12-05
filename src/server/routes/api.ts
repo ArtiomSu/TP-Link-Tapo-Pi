@@ -3,6 +3,7 @@ const router = exp.Router();
 const fs = require('fs');
 import AllDevices from "../../utils/allDevices";
 import { CustomDevice } from "../../utils/types";
+const { exec } = require("child_process");
 
 let allDevices:AllDevices; 
 
@@ -198,6 +199,33 @@ router.post('/setcolorbrightness/:id',async function(req, res, next) {
     return res.json({
       success: false,
       error: e 
+    });
+  }
+});
+
+router.get('/restart-systemd', async function(req, res, next) {
+  try{
+    exec("sudo systemctl restart tapoSystemd.service", (error, stdout, stderr) => {
+        if (error) {
+            return res.json({
+              success: false,
+              error: error
+            });
+        }
+        if (stderr) {
+            return res.json({
+              success: false,
+              error: stderr
+            });
+        }
+        return res.json({
+          success: true,
+        });
+    });
+  }catch(e){
+    return res.json({
+      success: false,
+      error: e
     });
   }
 });

@@ -1,14 +1,24 @@
 <!DOCTYPE html>
     <head>
         <link rel="stylesheet" href="/stylesheets/style.css">
+        <link rel="stylesheet" href="/stylesheets/material.css"/>
         <script type="text/javascript" src="javascripts/iro.min.js"></script>
         <script type="module" src="/javascripts/index.js"></script>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+        <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" /> -->
         <!-- <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> -->
     </head>
     <body>
-        <h1>Tapo Controller</h1>
-        <div id="all-devices"></div>
+        <div class="heading-container">
+            <h1>Tapo Controller</h1>
+            <span class="material-symbols-outlined clickable" onclick="window.toggleOptions()">
+                menu
+            </span>
+        </div>
+        <div>
+            <div class="bottom-action-button dangerous" onclick="window.TapoClient.restart()">
+                Restart Systemd Service
+            </div>
+        </div>
         <div class="bottom-actions">
             <div class="bottom-action-button" onclick="window.TapoClient.initialise()">
                 Initialise
@@ -23,5 +33,6 @@
                 Keep Updating
             </div>
         </div>
+        <div id="all-devices"></div>
     </body>
 </html>

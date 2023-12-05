@@ -1,12 +1,24 @@
 :root{
-  --primary: rgb(235, 142, 119);
-  --seconday: rgb(235, 119, 119);
-  --on: rgba(140, 235, 119, 0.404);
-  --off: rgba(235, 119, 119, 0.404);
+  --primary: rgb(240, 96, 60);
+  --seconday: rgb(180, 72, 72);
+  --on: rgba(83, 183, 61, 0.404);
+  --off: rgba(181, 62, 62, 0.404);
   --background: rgb(25, 25, 25);
   --white: rgb(190, 190, 190);
-  --black: rgb(36, 36, 36);
+  --black: rgb(20, 20, 20);
   --card-background: rgb(106, 106, 106);
+}
+
+.heading-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--white);
+}
+
+.clickable{
+  cursor: pointer;
 }
 
 body {
@@ -79,6 +91,7 @@ a {
   row-gap: 1em;
   grid-template-columns: repeat(4, 1fr);
   margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 .bottom-action-button{
@@ -94,6 +107,13 @@ a {
   cursor: pointer;
   background-color: var(--seconday); 
   transition: background-color 1000ms linear, color 1000ms linear;
+}
+
+.dangerous{
+  display: none;
+  background-color: var(--black);
+  color: var(--white);
+  justify-content: center;
 }
 
 .device-controls{
